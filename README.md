@@ -60,8 +60,6 @@ React Frontend Dashboard
 * Modular microservice-ready design
 
 ---
-![Uploading WhatsApp Image 2026-03-01 at 10.26.43 PM.jpeg…]()
-
 ## 🚀 Installation & Setup
 
 ### 1️⃣ Clone Repository
