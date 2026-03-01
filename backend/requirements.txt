@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+torch
+torchvision
+timm
+pillow
+python-multipart
+opencv-python 
+numpy 
+pillow 
+exifread 
+scikit-image 
+scipy

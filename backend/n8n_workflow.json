@@ -1,0 +1,229 @@
+{
+  "name": "TruthLens - Modular Analysis Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "final-score",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-start",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "final-score"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8000/ai-detection",
+        "jsonParameters": true,
+        "options": {
+          "timeout": 30
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "id": "ai-detection-node",
+      "name": "AI Detection Analysis",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [550, 150],
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8000/fact-check",
+        "jsonParameters": true,
+        "options": {
+          "timeout": 30
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "id": "fact-check-node",
+      "name": "Fact-Check Analysis",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [550, 300],
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8000/source-score",
+        "jsonParameters": true,
+        "options": {
+          "timeout": 30
+        },
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "id": "source-score-node",
+      "name": "Source Credibility Analysis",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [550, 450],
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "ai_detection",
+              "value": "={{ $fromNode[\"ai-detection-node\"].json }}",
+              "type": "object"
+            },
+            {
+              "id": "a2",
+              "name": "fact_check",
+              "value": "={{ $fromNode[\"fact-check-node\"].json }}",
+              "type": "object"
+            },
+            {
+              "id": "a3",
+              "name": "source_credibility",
+              "value": "={{ $fromNode[\"source-score-node\"].json }}",
+              "type": "object"
+            },
+            {
+              "id": "a4",
+              "name": "input",
+              "value": "={{ $fromNode[\"webhook-start\"].json.body }}",
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "id": "merge-results",
+      "name": "Merge Results",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [800, 300],
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract scores from parallel analyses\nconst aiDetection = $('merge-results').first().json.ai_detection;\nconst factCheck = $('merge-results').first().json.fact_check;\nconst sourceCredibility = $('merge-results').first().json.source_credibility;\n\n// Extract individual scores\nconst deepfake_score = aiDetection.deepfake_score || 0.5;\nconst fact_score = factCheck.fact_score || 0.5;\nconst source_score = sourceCredibility.source_score || 0.5;\nconst sentiment_score = 0; // Default sentiment\n\n// Calculate weighted final score\n// Weights: AI=40%, Fact=30%, Source=20%, Sentiment=10%\nconst sentiment_normalized = (sentiment_score + 1) / 2;\nconst final_score = (deepfake_score * 0.4) + (fact_score * 0.3) + (source_score * 0.2) + (sentiment_normalized * 0.1);\n\n// Determine verdict\nlet verdict = 'Fake';\nif (final_score >= 0.7) {\n  verdict = 'Likely True';\n} else if (final_score >= 0.4) {\n  verdict = 'Suspicious';\n}\n\n// Return final analysis\nreturn {\n  deepfake_score: parseFloat(deepfake_score.toFixed(4)),\n  fact_score: parseFloat(fact_score.toFixed(4)),\n  source_score: parseFloat(source_score.toFixed(4)),\n  sentiment_score: parseFloat(sentiment_score.toFixed(4)),\n  final_score: parseFloat(final_score.toFixed(4)),\n  verdict: verdict,\n  confidence: {\n    ai_detection: aiDetection.confidence || 0.8,\n    fact_check: factCheck.confidence || 0.75,\n    source_credibility: sourceCredibility.confidence || 0.8\n  },\n  analysis_metadata: {\n    verified_claims: factCheck.verified_claims || 0,\n    disputed_claims: factCheck.disputed_claims || 0,\n    domain_reputation: sourceCredibility.domain_reputation || 'unknown'\n  },\n  timestamp: new Date().toISOString()\n};"
+      },
+      "id": "calculate-trust-score",
+      "name": "Calculate Trust Score",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1050, 300],
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "responseCode": 200,
+        "options": {}
+      },
+      "id": "webhook-response",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1300, 300],
+      "credentials": {}
+    }
+  ],
+  "connections": {
+    "webhook-start": {
+      "main": [
+        [
+          {
+            "node": "ai-detection-node",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "fact-check-node",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "source-score-node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ai-detection-node": {
+      "main": [
+        [
+          {
+            "node": "merge-results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "fact-check-node": {
+      "main": [
+        [
+          {
+            "node": "merge-results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "source-score-node": {
+      "main": [
+        [
+          {
+            "node": "merge-results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "merge-results": {
+      "main": [
+        [
+          {
+            "node": "calculate-trust-score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "calculate-trust-score": {
+      "main": [
+        [
+          {
+            "node": "webhook-response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

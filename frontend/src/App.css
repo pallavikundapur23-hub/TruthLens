@@ -1,0 +1,99 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(135deg, #0a1428 0%, #0f2845 50%, #1a3a52 100%);
+}
+
+#root {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* BUTTONS */
+button {
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  outline: none;
+}
+
+button:active {
+  transform: translateY(1px) !important;
+}
+
+/* INPUTS */
+input[type="file"],
+textarea {
+  font-family: inherit;
+  transition: all 0.3s ease;
+}
+
+textarea::placeholder {
+  color: #64748b;
+}
+
+input[type="file"]::file-selector-button {
+  background: linear-gradient(135deg, #00b4d8, #00d4ff);
+  color: #0a1428;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+input[type="file"]::file-selector-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 180, 216, 0.3);
+}
+
+/* SCROLLBAR STYLING */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 40, 69, 0.8);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #00b4d8, #00d4ff);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #0096b8, #00b4d8);
+}
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  body {
+    padding: 10px;
+  }
+
+  #root {
+    padding: 0 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 32px !important;
+  }
+
+  h2 {
+    font-size: 48px !important;
+  }
+}
