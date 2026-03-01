@@ -58,7 +58,27 @@ React Frontend Dashboard
 * Git & GitHub
 * Ready for AWS deployment
 * Modular microservice-ready design
+## 🏗️ System Architecture
 
+<p align="center">
+  <img src="Architecture.jpeg" width="800"/>
+</p>
+
+---
+
+## 🖥️ System View
+
+<p align="center">
+  <img src="View.jpeg" width="800"/>
+</p>
+
+---
+
+## 🔄 Workflow Diagram
+
+<p align="center">
+  <img src="flow%20diagram.jpeg" width="800"/>
+</p>
 ---
 ## 🚀 Installation & Setup
 
