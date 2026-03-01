@@ -145,7 +145,7 @@ Aggregates outputs from all modules and calculates a final **Trust Score (0–10
 ✔ Scalable backend architecture
 ✔ Clean React dashboard UI
 ✔ Cloud-deployment ready
-✔ IEEE publication-ready structure
+
 
 ---
 
